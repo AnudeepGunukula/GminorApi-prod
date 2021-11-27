@@ -43,7 +43,13 @@ namespace GminorApi.Controllers
         public static Random random = new Random();
 
 
-
+        [HttpGet]
+        [Route("TestPush")]
+        public IActionResult TestPush()
+        {
+            return Ok("Hello world , push working");
+        
+        }
         [HttpGet]
         [Route("StartSongs")]
         public async Task<IActionResult> StartSongs()
