@@ -44,13 +44,6 @@ namespace GminorApi.Controllers
 
 
         [HttpGet]
-        [Route("TestPush")]
-        public IActionResult TestPush()
-        {
-            return Ok("Hello world , push working");
-        
-        }
-        [HttpGet]
         [Route("StartSongs")]
         public async Task<IActionResult> StartSongs()
         {
