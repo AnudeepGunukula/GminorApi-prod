@@ -17,7 +17,7 @@ namespace GminorApi.Controllers
         private static readonly HttpClient httpClient;
         static JioSaavnApiController()
         {
-            httpClient=new HttpClient();
+            httpClient = new HttpClient();
         }
 
         private static readonly string song_details_base_url = "https://www.jiosaavn.com/api.php?__call=song.getDetails&cc=in&_marker=0%3F_marker%3D0&_format=json&pids=";
@@ -47,7 +47,7 @@ namespace GminorApi.Controllers
         [Route("StartSongs")]
         public async Task<IActionResult> StartSongs()
         {
-            string url= $"https://www.jiosaavn.com:443/api.php?__call=webapi.get&token=j2,VLFcNmrA_&type=playlist&p=1&n=50&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0";
+            string url = $"https://www.jiosaavn.com:443/api.php?__call=webapi.get&token=j2,VLFcNmrA_&type=playlist&p=1&n=50&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0";
             string referer = "https://www.jiosaavn.com/";
 
 
@@ -68,7 +68,7 @@ namespace GminorApi.Controllers
             request.Headers.TryAddWithoutValidation("TE", "trailers");
 
             var response = await httpClient.SendAsync(request);
-            
+
 
             var result = response.Content.ReadAsStringAsync().Result;
 
@@ -95,53 +95,68 @@ namespace GminorApi.Controllers
 
             for (int i = 0; i < tokens.Count; i++)
             {
-                string url = $"https://www.jiosaavn.com:443/api.php?__call=webapi.get&token={tokens.ElementAt(i)}&type=playlist&p=1&n=50&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0";
-                string referer = "https://www.jiosaavn.com/";
 
-                if(tokens[i]== "TDf7I3RaiT0_")
+                try
                 {
-                    url = $"https://www.jiosaavn.com/api.php?__call=webapi.get&token=TDf7I3RaiT0_&type=artist&p=&n_song=50&n_album=50&sub_type=&category=&sort_order=&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0"; 
+                    string url = $"https://www.jiosaavn.com:443/api.php?__call=webapi.get&token={tokens.ElementAt(i)}&type=playlist&p=1&n=50&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0";
+                    string referer = "https://www.jiosaavn.com/";
+
+                    if (tokens[i] == "TDf7I3RaiT0_")
+                    {
+                        url = $"https://www.jiosaavn.com/api.php?__call=webapi.get&token=TDf7I3RaiT0_&type=artist&p=&n_song=50&n_album=50&sub_type=&category=&sort_order=&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0";
+                    }
+
+
+                    // var httpClient = new HttpClient(new HttpClientHandler());
+                    var request = new HttpRequestMessage(new HttpMethod("GET"), url);
+                    var user_ag = user_agent[random.Next(user_agent.Count)];
+
+                    request.Headers.TryAddWithoutValidation("Host", "www.jiosaavn.com");
+                    request.Headers.TryAddWithoutValidation("User-Agent", user_ag);
+                    request.Headers.TryAddWithoutValidation("Accept", "application/json, text/plain, */*");
+                    request.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.5");
+                    request.Headers.TryAddWithoutValidation("DNT", "1");
+                    request.Headers.TryAddWithoutValidation("Connection", "keep-alive");
+                    request.Headers.TryAddWithoutValidation("Referer", referer);
+                    request.Headers.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
+                    request.Headers.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
+                    request.Headers.TryAddWithoutValidation("Sec-Fetch-Site", "same-origin");
+                    request.Headers.TryAddWithoutValidation("Cache-Control", "max-age=0");
+                    request.Headers.TryAddWithoutValidation("TE", "trailers");
+
+                    var response = await httpClient.SendAsync(request);
+
+
+                    var result = response.Content.ReadAsStringAsync().Result;
+
+                    var songIds = GetSongs(result);
+
+
+                    songIds.RemoveAt(0);
+
+
+                    songList.AddRange(songIds);
+
                 }
 
+                catch (Exception e)
+                {
+                    continue;
+                }
+                finally
+                {
 
-               // var httpClient = new HttpClient(new HttpClientHandler());
-                var request = new HttpRequestMessage(new HttpMethod("GET"), url);
-                var user_ag = user_agent[random.Next(user_agent.Count)];
-
-                request.Headers.TryAddWithoutValidation("Host", "www.jiosaavn.com");
-                request.Headers.TryAddWithoutValidation("User-Agent", user_ag);
-                request.Headers.TryAddWithoutValidation("Accept", "application/json, text/plain, */*");
-                request.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.5");
-                request.Headers.TryAddWithoutValidation("DNT", "1");
-                request.Headers.TryAddWithoutValidation("Connection", "keep-alive");
-                request.Headers.TryAddWithoutValidation("Referer", referer);
-                request.Headers.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
-                request.Headers.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
-                request.Headers.TryAddWithoutValidation("Sec-Fetch-Site", "same-origin");
-                request.Headers.TryAddWithoutValidation("Cache-Control", "max-age=0");
-                request.Headers.TryAddWithoutValidation("TE", "trailers");
-
-                var response = await httpClient.SendAsync(request);
-
-
-                var result = response.Content.ReadAsStringAsync().Result;
-
-                var songIds = GetSongs(result);
-
-
-                songIds.RemoveAt(0);
-
-
-                songList.AddRange(songIds);
+                }
 
             }
-            List<SearchResult> engsongList=GetEnglish().Result;
+            List<SearchResult> engsongList = GetEnglish().Result;
             songList.AddRange(engsongList);
 
 
             songList = songList.GroupBy(x => x.Id).Select(x => x.First()).ToList();
             var shuffledsongs = songList.OrderBy(a => Guid.NewGuid()).ToList();
             Console.WriteLine(shuffledsongs.Count);
+
             return Ok(shuffledsongs);
         }
 
@@ -153,14 +168,14 @@ namespace GminorApi.Controllers
             List<string> engtokens = new List<string>() { "I3kvhipIy73uCJW60TJk1Q__", "LdbVc1Z5i9E_", "jVmOAc1aK2OO0eMLZZxqsA__" };
 
             List<string> engref = new List<string>() { "featured/trending_today/I3kvhipIy73uCJW60TJk1Q__", "featured/weekly-top-songs/LdbVc1Z5i9E_", "featured/romantic_top_40_-__english/jVmOAc1aK2OO0eMLZZxqsA__" };
-           
+
             for (int i = 0; i < engtokens.Count; i++)
             {
                 string url = $"https://www.jiosaavn.com/api.php?__call=webapi.get&token={engtokens[i]}&type=playlist&p=1&n=50&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0";
                 string referer = "https://www.jiosaavn.com/";
                 referer = referer + engref[i];
 
-               // var httpClient = new HttpClient(new HttpClientHandler());
+                // var httpClient = new HttpClient(new HttpClientHandler());
                 var request = new HttpRequestMessage(new HttpMethod("GET"), url);
                 request.Headers.TryAddWithoutValidation("Host", "www.jiosaavn.com");
                 request.Headers.TryAddWithoutValidation("Cookie", "DL:english;L:english");
@@ -169,17 +184,17 @@ namespace GminorApi.Controllers
                 request.Headers.TryAddWithoutValidation("Sec-Fetch-Site", "same-origin");
                 request.Headers.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
                 request.Headers.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
-               // request.Headers.TryAddWithoutValidation("Origin", "www.jiosaavn.com");
-                request.Headers.TryAddWithoutValidation("Referer",referer);
+                // request.Headers.TryAddWithoutValidation("Origin", "www.jiosaavn.com");
+                request.Headers.TryAddWithoutValidation("Referer", referer);
                 request.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
 
                 var response = await httpClient.SendAsync(request);
 
-                var songs =GetSongs(response.Content.ReadAsStringAsync().Result);
+                var songs = GetSongs(response.Content.ReadAsStringAsync().Result);
 
                 songs.RemoveAt(0);
 
-                engsongs.AddRange(songs); 
+                engsongs.AddRange(songs);
 
             }
             return engsongs;
@@ -192,7 +207,7 @@ namespace GminorApi.Controllers
         {
 
             string url = album_details_base_url + id;
-          //  var httpClient = new HttpClient(new HttpClientHandler());
+            //  var httpClient = new HttpClient(new HttpClientHandler());
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             var user_ag = user_agent[random.Next(user_agent.Count)];
@@ -279,7 +294,7 @@ namespace GminorApi.Controllers
             // in the below url p=1 means page 1, u can get much more results by incrementing it
             string url = "https://www.jiosaavn.com/api.php?p=1&q=" + songName + "&_format=json&_marker=0&api_version=4&ctx=wap6dot0&n=20&__call=search.getResults";
             string referer = "https://www.jiosaavn.com/search/" + songName;
-         //   var httpClient = new HttpClient(new HttpClientHandler());
+            //   var httpClient = new HttpClient(new HttpClientHandler());
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
             request.Headers.TryAddWithoutValidation("Host", "www.jiosaavn.com");
             request.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0");
@@ -312,7 +327,7 @@ namespace GminorApi.Controllers
         public async Task<IActionResult> SongDetails(string id)
         {
             string url = song_details_base_url + id;
-         //   var httpClient = new HttpClient(new HttpClientHandler());
+            //   var httpClient = new HttpClient(new HttpClientHandler());
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             var user_ag = user_agent[random.Next(user_agent.Count)];
@@ -375,7 +390,7 @@ namespace GminorApi.Controllers
         {
 
             string url = lyrics_base_url + id;
-         //   var httpClient = new HttpClient(new HttpClientHandler());
+            //   var httpClient = new HttpClient(new HttpClientHandler());
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             var user_ag = user_agent[random.Next(user_agent.Count)];
